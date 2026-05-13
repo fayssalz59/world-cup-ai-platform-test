@@ -18,12 +18,13 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Monitoring: Azure Monitor / Application Insights
 - Infrastructure: Terraform
 
-## Day 1 Progress
+## Day 1 Status
 
 - Project repository initialized
 - Python environment created
-- Azure CLI configured
-- Azure Resource Group created
-- Azure Storage Account created
-- Bronze/Silver/Gold containers created
-- First test file uploaded to Azure Blob Storage
+- Azure CLI installed and detected
+- Azure login refresh pending
+- Azure Resource Group creation pending
+- Azure Storage Account creation pending
+- Bronze/Silver/Gold container creation pending
+- First test file upload to Azure Blob Storage pending
