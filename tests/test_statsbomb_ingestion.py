@@ -4,6 +4,7 @@ import pytest
 
 from ingestion.ingest_statsbomb_open_data import (
     as_pretty_json,
+    bronze_paths,
     match_id_from_match,
     write_local_json,
 )
@@ -44,3 +45,23 @@ def test_match_id_from_match_returns_integer_match_id() -> None:
 def test_match_id_from_match_rejects_missing_match_id() -> None:
     with pytest.raises(ValueError):
         match_id_from_match({"home_team": "France"})
+
+
+def test_bronze_paths_are_partitioned_for_data_lake() -> None:
+    paths = bronze_paths(
+        competition_id=43,
+        season_id=106,
+        ingestion_date="2026-05-14",
+        match_id=3857256,
+    )
+
+    assert paths["competitions"] == (
+        "statsbomb/competitions/ingestion_date=2026-05-14/competitions.json"
+    )
+    assert paths["matches"] == (
+        "statsbomb/matches/competition=world_cup/season=2022/"
+        "ingestion_date=2026-05-14/matches.json"
+    )
+    assert paths["events"] == (
+        "statsbomb/events/match_id=3857256/ingestion_date=2026-05-14/events.json"
+    )
