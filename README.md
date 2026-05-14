@@ -58,3 +58,9 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Pre-match rolling team-form features added
 - Prediction-safe match features created with no current-match leakage
 - Pre-match Gold Parquet uploaded to Azure Blob Storage
+
+## Day 7 Status
+
+- Pre-match match-result model added
+- Model trains from rolling historical features only
+- Metrics and pre-match model artifacts generated locally
