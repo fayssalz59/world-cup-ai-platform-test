@@ -52,3 +52,9 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Baseline match-result ML pipeline added
 - Random Forest classifier trained from Gold match features
 - Metrics and model artifacts generated locally
+
+## Day 6 Status
+
+- Pre-match rolling team-form features added
+- Prediction-safe match features created with no current-match leakage
+- Pre-match Gold Parquet uploaded to Azure Blob Storage
