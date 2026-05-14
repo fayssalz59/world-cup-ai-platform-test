@@ -10,3 +10,4 @@ data/
 .tools/
 models/
 reports/
+run_all_statsbomb.ps1

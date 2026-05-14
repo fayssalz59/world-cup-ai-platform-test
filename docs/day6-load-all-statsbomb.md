@@ -18,6 +18,49 @@ python -m orchestration.generate_statsbomb_pipeline_commands --limit 2 --ingesti
 python -m orchestration.generate_statsbomb_pipeline_commands --ingestion-date 2026-05-14
 ```
 
+## Direct Python Orchestrator
+
+Preferred option:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline --ingestion-date 2026-05-14 --workers 2
+```
+
+Dry run:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline --dry-run
+```
+
+Smoke test:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline --limit 1 --ingestion-date 2026-05-14 --workers 1
+```
+
+Run only Silver, Gold and ML after Bronze already exists:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline --skip-bronze --ingestion-date 2026-05-14
+```
+
+Run only ML after Gold already exists:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline --skip-bronze --skip-silver --skip-gold
+```
+
+Run selected datasets only:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline `
+  --dataset world_cup:2022 `
+  --dataset champions_league:2018_2019 `
+  --skip-bronze `
+  --skip-silver `
+  --skip-gold
+```
+
 To save the commands:
 
 ```powershell
