@@ -26,6 +26,17 @@ Preferred option:
 python -m orchestration.run_all_statsbomb_pipeline --ingestion-date 2026-05-14 --workers 2
 ```
 
+This runs:
+
+```text
+Bronze ingestion
+Silver Parquet
+Gold post-match features
+Gold pre-match rolling features
+post-match baseline model
+pre-match baseline model
+```
+
 Dry run:
 
 ```powershell
@@ -44,10 +55,10 @@ Run only Silver, Gold and ML after Bronze already exists:
 python -m orchestration.run_all_statsbomb_pipeline --skip-bronze --ingestion-date 2026-05-14
 ```
 
-Run only ML after Gold already exists:
+Run only post-match and pre-match models after all Gold tables already exist:
 
 ```powershell
-python -m orchestration.run_all_statsbomb_pipeline --skip-bronze --skip-silver --skip-gold
+python -m orchestration.run_all_statsbomb_pipeline --skip-bronze --skip-silver --skip-gold --skip-prematch-gold
 ```
 
 Run selected datasets only:
@@ -59,6 +70,17 @@ python -m orchestration.run_all_statsbomb_pipeline `
   --skip-bronze `
   --skip-silver `
   --skip-gold
+```
+
+Skip post-match model and train only pre-match model:
+
+```powershell
+python -m orchestration.run_all_statsbomb_pipeline `
+  --skip-bronze `
+  --skip-silver `
+  --skip-gold `
+  --skip-prematch-gold `
+  --skip-ml
 ```
 
 To save the commands:

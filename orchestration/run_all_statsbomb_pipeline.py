@@ -10,8 +10,10 @@ from ingestion.ingest_statsbomb_open_data import (
     ingest_statsbomb_open_data,
 )
 from ingestion.statsbomb_client import StatsBombOpenDataClient
+from ml.train_prematch_result_model import train_prematch_result_model
 from ml.train_match_result_model import train_match_result_model
 from transformation.statsbomb_gold import build_gold_dataset
+from transformation.statsbomb_prematch import build_prematch_gold_dataset
 from transformation.statsbomb_silver import build_silver_dataset
 
 
@@ -117,6 +119,17 @@ def run_gold(datasets: list[dict]) -> None:
         logger.info("Gold done {}", dataset["dataset"])
 
 
+def run_prematch_gold(datasets: list[dict], window: int) -> None:
+    for dataset in datasets:
+        logger.info("Pre-match Gold start {}", dataset["dataset"])
+        build_prematch_gold_dataset(
+            dataset["competition_slug"],
+            dataset["season_slug"],
+            window=window,
+        )
+        logger.info("Pre-match Gold done {}", dataset["dataset"])
+
+
 def run_pipeline(
     limit: int | None,
     selected_datasets: list[str] | None,
@@ -127,8 +140,12 @@ def run_pipeline(
     skip_bronze: bool,
     skip_silver: bool,
     skip_gold: bool,
+    skip_prematch_gold: bool,
     skip_ml: bool,
+    skip_prematch_ml: bool,
     dry_run: bool,
+    prematch_window: int,
+    prematch_min_history: int,
 ) -> list[str]:
     datasets = [
         dataset_metadata(item)
@@ -154,9 +171,18 @@ def run_pipeline(
         run_silver(datasets)
     if not skip_gold:
         run_gold(datasets)
+    if not skip_prematch_gold:
+        run_prematch_gold(datasets, window=prematch_window)
     if not skip_ml:
         train_match_result_model(
             datasets=dataset_keys,
+            test_size=0.25,
+            random_state=42,
+        )
+    if not skip_prematch_ml:
+        train_prematch_result_model(
+            datasets=dataset_keys,
+            min_history=prematch_min_history,
             test_size=0.25,
             random_state=42,
         )
@@ -181,9 +207,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--skip-bronze", action="store_true")
     parser.add_argument("--skip-silver", action="store_true")
     parser.add_argument("--skip-gold", action="store_true")
+    parser.add_argument("--skip-prematch-gold", action="store_true")
     parser.add_argument("--skip-ml", action="store_true")
+    parser.add_argument("--skip-prematch-ml", action="store_true")
     parser.add_argument("--no-lineups", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--prematch-window", type=int, default=5)
+    parser.add_argument("--prematch-min-history", type=int, default=1)
     return parser.parse_args()
 
 
@@ -199,8 +229,12 @@ def main() -> None:
         skip_bronze=args.skip_bronze,
         skip_silver=args.skip_silver,
         skip_gold=args.skip_gold,
+        skip_prematch_gold=args.skip_prematch_gold,
         skip_ml=args.skip_ml,
+        skip_prematch_ml=args.skip_prematch_ml,
         dry_run=args.dry_run,
+        prematch_window=args.prematch_window,
+        prematch_min_history=args.prematch_min_history,
     )
 
 
