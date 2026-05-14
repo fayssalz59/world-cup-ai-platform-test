@@ -8,3 +8,5 @@ data/
 .idea/
 .azure-certs/
 .tools/
+models/
+reports/

@@ -46,3 +46,9 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Gold feature tables built from Silver
 - Team-match and match-level feature datasets added
 - Gold Parquet uploaded to Azure Blob Storage
+
+## Day 5 Status
+
+- Baseline match-result ML pipeline added
+- Random Forest classifier trained from Gold match features
+- Metrics and model artifacts generated locally
