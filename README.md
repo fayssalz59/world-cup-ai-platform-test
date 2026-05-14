@@ -40,3 +40,9 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Bronze StatsBomb JSON transformed into Silver Parquet
 - Silver tables added for matches, events, shots, passes and lineups
 - Silver Parquet uploaded to Azure Blob Storage
+
+## Day 4 Status
+
+- Gold feature tables built from Silver
+- Team-match and match-level feature datasets added
+- Gold Parquet uploaded to Azure Blob Storage
