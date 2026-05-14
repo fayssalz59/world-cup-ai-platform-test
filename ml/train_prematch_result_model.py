@@ -1,6 +1,6 @@
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import joblib
@@ -14,7 +14,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
 from ingestion.config import PROJECT_ROOT
-
 
 WINDOW = 5
 FEATURE_COLUMNS = [
@@ -74,7 +73,7 @@ def load_prematch_datasets(datasets: list[str]) -> pd.DataFrame:
 
 
 def prepare_training_frame(dataframe: pd.DataFrame, min_history: int) -> pd.DataFrame:
-    required_columns = FEATURE_COLUMNS + [TARGET_COLUMN]
+    required_columns = [*FEATURE_COLUMNS, TARGET_COLUMN]
     missing = [column for column in required_columns if column not in dataframe.columns]
     if missing:
         raise ValueError(f"Missing required pre-match ML columns: {missing}")
@@ -88,7 +87,9 @@ def prepare_training_frame(dataframe: pd.DataFrame, min_history: int) -> pd.Data
     return prepared
 
 
-def split_dataset(dataframe: pd.DataFrame, test_size: float, random_state: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+def split_dataset(
+    dataframe: pd.DataFrame, test_size: float, random_state: int
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     x = dataframe[FEATURE_COLUMNS]
     y = dataframe[TARGET_COLUMN]
     stratify = y if y.value_counts().min() >= 2 else None
@@ -136,7 +137,9 @@ def evaluate_model(model: Pipeline, x_test: pd.DataFrame, y_test: pd.Series) -> 
     }
 
 
-def evaluate_dummy_baseline(x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, y_test: pd.Series) -> float:
+def evaluate_dummy_baseline(
+    x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, y_test: pd.Series
+) -> float:
     dummy = DummyClassifier(strategy="most_frequent")
     dummy.fit(x_train, y_train)
     return accuracy_score(y_test, dummy.predict(x_test))
@@ -156,9 +159,7 @@ def train_prematch_result_model(
     raw = load_prematch_datasets(datasets)
     training_frame = prepare_training_frame(raw, min_history=min_history)
     if len(training_frame) < 10:
-        raise ValueError(
-            f"Not enough rows after min_history={min_history}: {len(training_frame)}"
-        )
+        raise ValueError(f"Not enough rows after min_history={min_history}: {len(training_frame)}")
 
     x_train, x_test, y_train, y_test = split_dataset(training_frame, test_size, random_state)
     model = build_model(random_state)
@@ -173,7 +174,7 @@ def train_prematch_result_model(
     metrics["test_rows"] = len(x_test)
     metrics["min_history"] = min_history
     metrics["feature_columns"] = FEATURE_COLUMNS
-    metrics["trained_at_utc"] = datetime.now(timezone.utc).isoformat()
+    metrics["trained_at_utc"] = datetime.now(UTC).isoformat()
     metrics["model_type"] = "RandomForestClassifier"
     metrics["model_note"] = "Pre-match model using only historical rolling features known before kickoff."
 

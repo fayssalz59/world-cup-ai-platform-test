@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import sys
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
@@ -192,7 +193,9 @@ def latest_ingestion_path(base_dir: Path, file_name: str) -> Path:
     return candidates[-1]
 
 
-def load_bronze_dataset(bronze_dir: Path, competition: str, season: str) -> tuple[list[dict[str, Any]], dict[int, list[dict[str, Any]]], dict[int, list[dict[str, Any]]]]:
+def load_bronze_dataset(
+    bronze_dir: Path, competition: str, season: str
+) -> tuple[list[dict[str, Any]], dict[int, list[dict[str, Any]]], dict[int, list[dict[str, Any]]]]:
     matches_path = latest_ingestion_path(
         bronze_dir / "statsbomb" / "matches" / f"competition={competition}" / f"season={season}",
         "matches.json",
@@ -209,10 +212,8 @@ def load_bronze_dataset(bronze_dir: Path, competition: str, season: str) -> tupl
             events_by_match[match_id] = load_json(latest_ingestion_path(events_base, "events.json"))
         except FileNotFoundError:
             continue
-        try:
+        with suppress(FileNotFoundError):
             lineups_by_match[match_id] = load_json(latest_ingestion_path(lineups_base, "lineups.json"))
-        except FileNotFoundError:
-            pass
 
     return matches, events_by_match, lineups_by_match
 

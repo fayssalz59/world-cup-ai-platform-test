@@ -1,10 +1,9 @@
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from dotenv import load_dotenv
-
 
 load_dotenv()
 
@@ -22,7 +21,7 @@ blob_service_client = BlobServiceClient(
     credential=credential,
 )
 
-content = f"World Cup AI Platform test upload - {datetime.now(timezone.utc).isoformat()}"
+content = f"World Cup AI Platform test upload - {datetime.now(UTC).isoformat()}"
 blob_name = "test/day1_upload.txt"
 
 blob_client = blob_service_client.get_blob_client(

@@ -1,0 +1,78 @@
+[tool.black]
+line-length = 120
+target-version = ["py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.git
+  | \.cache
+  | \.venv
+  | \.tools
+  | data
+  | models
+  | reports
+)/
+'''
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = [
+  ".venv",
+  ".cache",
+  ".tools",
+  "data",
+  "models",
+  "reports",
+]
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "F",
+  "I",
+  "B",
+  "UP",
+  "SIM",
+  "RUF",
+]
+ignore = [
+  "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+ignore_missing_imports = true
+pretty = true
+exclude = [
+  "^\\.venv/",
+  "^\\.cache/",
+  "^\\.tools/",
+  "^data/",
+  "^models/",
+  "^reports/",
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "tests.*",
+]
+disable_error_code = [
+  "attr-defined",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+  "--strict-markers",
+  "--strict-config",
+]

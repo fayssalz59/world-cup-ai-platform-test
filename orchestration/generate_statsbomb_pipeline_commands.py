@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from ingestion.config import DEFAULT_STATSBOMB_BASE_URL, configure_local_cert_bundle
 from ingestion.ingest_statsbomb_open_data import infer_competition_slug
@@ -46,16 +46,8 @@ def generate_commands(limit: int | None, ingestion_date: str, max_event_matches:
                     f"--ingestion-date {ingestion_date} "
                     "--include-lineups"
                 ),
-                (
-                    "python -m transformation.statsbomb_silver "
-                    f"--competition {competition_slug} "
-                    f"--season {season_slug}"
-                ),
-                (
-                    "python -m transformation.statsbomb_gold "
-                    f"--competition {competition_slug} "
-                    f"--season {season_slug}"
-                ),
+                (f"python -m transformation.statsbomb_silver --competition {competition_slug} --season {season_slug}"),
+                (f"python -m transformation.statsbomb_gold --competition {competition_slug} --season {season_slug}"),
             ]
         )
 
@@ -73,7 +65,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=None, help="Generate commands for only the first N datasets.")
     parser.add_argument(
         "--ingestion-date",
-        default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        default=datetime.now(UTC).strftime("%Y-%m-%d"),
         help="Bronze ingestion_date partition.",
     )
     parser.add_argument(

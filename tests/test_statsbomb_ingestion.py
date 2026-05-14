@@ -16,10 +16,7 @@ from ingestion.statsbomb_client import StatsBombOpenDataClient
 def test_statsbomb_client_builds_raw_github_url() -> None:
     client = StatsBombOpenDataClient("https://example.com/data/")
 
-    assert (
-        client.url_for("matches/43/106.json")
-        == "https://example.com/data/matches/43/106.json"
-    )
+    assert client.url_for("matches/43/106.json") == "https://example.com/data/matches/43/106.json"
 
 
 def test_as_pretty_json_keeps_valid_json() -> None:
@@ -57,16 +54,11 @@ def test_bronze_paths_are_partitioned_for_data_lake() -> None:
         match_id=3857256,
     )
 
-    assert paths["competitions"] == (
-        "statsbomb/competitions/ingestion_date=2026-05-14/competitions.json"
-    )
+    assert paths["competitions"] == ("statsbomb/competitions/ingestion_date=2026-05-14/competitions.json")
     assert paths["matches"] == (
-        "statsbomb/matches/competition=world_cup/season=2022/"
-        "ingestion_date=2026-05-14/matches.json"
+        "statsbomb/matches/competition=world_cup/season=2022/ingestion_date=2026-05-14/matches.json"
     )
-    assert paths["events"] == (
-        "statsbomb/events/match_id=3857256/ingestion_date=2026-05-14/events.json"
-    )
+    assert paths["events"] == ("statsbomb/events/match_id=3857256/ingestion_date=2026-05-14/events.json")
 
 
 def test_slugify_makes_path_safe_values() -> None:

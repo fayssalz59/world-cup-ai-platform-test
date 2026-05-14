@@ -11,7 +11,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from ingestion.config import PROJECT_ROOT
 from ml.train_prematch_result_model import FEATURE_COLUMNS
 
-
 MODEL_PATH = PROJECT_ROOT / "models" / "prematch_result_baseline.joblib"
 METRICS_PATH = PROJECT_ROOT / "reports" / "prematch_result_baseline_metrics.json"
 
@@ -121,9 +120,7 @@ def available_teams(dataframe: pd.DataFrame) -> list[str]:
 
 def latest_team_row(dataframe: pd.DataFrame, team_name: str) -> pd.Series:
     normalized = normalize_team_name(team_name)
-    matches = dataframe[
-        dataframe["team_name"].astype(str).map(normalize_team_name) == normalized
-    ].copy()
+    matches = dataframe[dataframe["team_name"].astype(str).map(normalize_team_name) == normalized].copy()
 
     if matches.empty:
         raise HTTPException(
@@ -245,8 +242,7 @@ def predict(request: PredictionRequest) -> PredictionResponse:
 
     probabilities = model.predict_proba(row)[0]
     probability_map = {
-        str(label): round(float(probability), 6)
-        for label, probability in zip(labels, probabilities, strict=True)
+        str(label): round(float(probability), 6) for label, probability in zip(labels, probabilities, strict=True)
     }
 
     metrics = bundle["metrics"]

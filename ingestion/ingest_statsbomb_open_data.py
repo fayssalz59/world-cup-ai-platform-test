@@ -3,7 +3,7 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -60,10 +60,7 @@ def slugify(value: str) -> str:
 
 def infer_competition_slug(competition_id: int, season_id: int, competitions: list[dict[str, Any]]) -> tuple[str, str]:
     for competition in competitions:
-        if (
-            competition.get("competition_id") == competition_id
-            and competition.get("season_id") == season_id
-        ):
+        if competition.get("competition_id") == competition_id and competition.get("season_id") == season_id:
             competition_name = str(competition["competition_name"])
             season_name = str(competition["season_name"])
             if competition_name == "FIFA World Cup":
@@ -79,11 +76,7 @@ def bronze_paths(
     match_id: int | None = None,
 ) -> dict[str, str]:
     paths = {
-        "competitions": (
-            "statsbomb/competitions/"
-            f"ingestion_date={ingestion_date}/"
-            "competitions.json"
-        ),
+        "competitions": (f"statsbomb/competitions/ingestion_date={ingestion_date}/competitions.json"),
         "matches": (
             "statsbomb/matches/"
             f"competition={competition_slug}/"
@@ -93,18 +86,8 @@ def bronze_paths(
         ),
     }
     if match_id is not None:
-        paths["events"] = (
-            "statsbomb/events/"
-            f"match_id={match_id}/"
-            f"ingestion_date={ingestion_date}/"
-            "events.json"
-        )
-        paths["lineups"] = (
-            "statsbomb/lineups/"
-            f"match_id={match_id}/"
-            f"ingestion_date={ingestion_date}/"
-            "lineups.json"
-        )
+        paths["events"] = f"statsbomb/events/match_id={match_id}/ingestion_date={ingestion_date}/events.json"
+        paths["lineups"] = f"statsbomb/lineups/match_id={match_id}/ingestion_date={ingestion_date}/lineups.json"
     return paths
 
 
@@ -207,7 +190,7 @@ def main() -> None:
         season_id=args.season_id,
         include_lineups=args.include_lineups,
         max_event_matches=args.max_event_matches,
-        ingestion_date=args.ingestion_date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        ingestion_date=args.ingestion_date or datetime.now(UTC).strftime("%Y-%m-%d"),
     )
 
 

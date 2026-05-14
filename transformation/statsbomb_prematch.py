@@ -9,7 +9,6 @@ from loguru import logger
 from ingestion.azure_blob import AzureBlobUploader
 from ingestion.config import configure_local_cert_bundle, load_settings
 
-
 ROLLING_COLUMNS = [
     "goals_for",
     "goals_against",
@@ -54,20 +53,17 @@ def add_team_rolling_features(team_match_features: pd.DataFrame, window: int) ->
     dataframe["points"] = dataframe["result"].map(result_points)
     dataframe = dataframe.sort_values(["team_id", "match_date", "match_id"]).reset_index(drop=True)
 
-    for column in ROLLING_COLUMNS + ["points"]:
-        dataframe[f"prematch_avg_{column}_last_{window}"] = (
-            dataframe.groupby("team_id")[column]
-            .transform(lambda values: values.shift(1).rolling(window=window, min_periods=1).mean())
+    for column in [*ROLLING_COLUMNS, "points"]:
+        dataframe[f"prematch_avg_{column}_last_{window}"] = dataframe.groupby("team_id")[column].transform(
+            lambda values: values.shift(1).rolling(window=window, min_periods=1).mean()
         )
 
-    dataframe[f"prematch_matches_played_before"] = dataframe.groupby("team_id").cumcount()
-    dataframe[f"prematch_win_rate_last_{window}"] = (
-        dataframe.groupby("team_id")["result"]
-        .transform(lambda values: (values.shift(1) == "win").rolling(window=window, min_periods=1).mean())
+    dataframe["prematch_matches_played_before"] = dataframe.groupby("team_id").cumcount()
+    dataframe[f"prematch_win_rate_last_{window}"] = dataframe.groupby("team_id")["result"].transform(
+        lambda values: (values.shift(1) == "win").rolling(window=window, min_periods=1).mean()
     )
-    dataframe[f"prematch_unbeaten_rate_last_{window}"] = (
-        dataframe.groupby("team_id")["result"]
-        .transform(lambda values: (values.shift(1).isin(["win", "draw"])).rolling(window=window, min_periods=1).mean())
+    dataframe[f"prematch_unbeaten_rate_last_{window}"] = dataframe.groupby("team_id")["result"].transform(
+        lambda values: (values.shift(1).isin(["win", "draw"])).rolling(window=window, min_periods=1).mean()
     )
 
     return dataframe
@@ -85,14 +81,11 @@ def build_prematch_match_features(team_form: pd.DataFrame, window: int) -> pd.Da
         "goals_for",
         "goals_against",
         "result",
-        f"prematch_matches_played_before",
+        "prematch_matches_played_before",
         f"prematch_win_rate_last_{window}",
         f"prematch_unbeaten_rate_last_{window}",
     ]
-    rolling_feature_columns = [
-        f"prematch_avg_{column}_last_{window}"
-        for column in ROLLING_COLUMNS + ["points"]
-    ]
+    rolling_feature_columns = [f"prematch_avg_{column}_last_{window}" for column in [*ROLLING_COLUMNS, "points"]]
     selected_columns = base_columns + rolling_feature_columns
 
     home = team_form[team_form["is_home"]][selected_columns].copy()

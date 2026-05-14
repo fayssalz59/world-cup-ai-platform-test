@@ -55,7 +55,7 @@ def test_prepare_training_frame_keeps_only_model_columns() -> None:
 
     prepared = prepare_training_frame(dataframe)
 
-    assert list(prepared.columns) == FEATURE_COLUMNS + [TARGET_COLUMN]
+    assert list(prepared.columns) == [*FEATURE_COLUMNS, TARGET_COLUMN]
 
 
 def test_build_model_can_fit_small_dataset() -> None:

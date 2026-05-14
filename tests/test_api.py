@@ -1,4 +1,8 @@
+from typing import ClassVar
+
 import pandas as pd
+import pytest
+from fastapi import HTTPException
 
 from api.main import (
     PredictionRequest,
@@ -15,7 +19,7 @@ from ml.train_prematch_result_model import FEATURE_COLUMNS
 
 
 class StubModel:
-    classes_ = ["draw", "loss", "win"]
+    classes_: ClassVar[list[str]] = ["draw", "loss", "win"]
 
     def predict(self, dataframe):
         return ["win"]
@@ -132,25 +136,21 @@ def test_predict_rejects_missing_features(monkeypatch) -> None:
     monkeypatch.setattr("api.main.load_model_bundle", fake_bundle)
     features = {column: 1.0 for column in FEATURE_COLUMNS[:-1]}
 
-    try:
+    with pytest.raises(HTTPException) as exc_info:
         predict(PredictionRequest(features=features))
-    except Exception as exc:
-        assert getattr(exc, "status_code") == 422
-        assert "missing_features" in exc.detail
-    else:
-        raise AssertionError("Expected validation to reject missing features.")
+
+    assert exc_info.value.status_code == 422
+    assert "missing_features" in exc_info.value.detail
 
 
 def test_validate_features_rejects_unexpected_feature() -> None:
     features = {column: 1.0 for column in FEATURE_COLUMNS}
     features["extra"] = 1.0
 
-    try:
+    with pytest.raises(HTTPException) as exc_info:
         validate_features(features, FEATURE_COLUMNS)
-    except Exception as exc:
-        assert getattr(exc, "status_code") == 422
-    else:
-        raise AssertionError("Expected validation to reject unexpected feature.")
+
+    assert exc_info.value.status_code == 422
 
 
 def test_latest_team_row_is_case_insensitive_and_uses_latest_match() -> None:
@@ -203,7 +203,7 @@ def test_predict_from_teams_returns_prediction_with_sources(monkeypatch) -> None
 def test_predict_from_teams_rejects_unknown_team(monkeypatch) -> None:
     monkeypatch.setattr("api.main.load_team_form_dataset", lambda competition, season: sample_team_form_frame())
 
-    try:
+    with pytest.raises(HTTPException) as exc_info:
         predict_from_teams(
             TeamsPredictionRequest(
                 competition="world_cup",
@@ -212,8 +212,6 @@ def test_predict_from_teams_rejects_unknown_team(monkeypatch) -> None:
                 away_team_name="Argentina",
             )
         )
-    except Exception as exc:
-        assert getattr(exc, "status_code") == 404
-        assert "available_teams" in exc.detail
-    else:
-        raise AssertionError("Expected unknown team to be rejected.")
+
+    assert exc_info.value.status_code == 404
+    assert "available_teams" in exc_info.value.detail

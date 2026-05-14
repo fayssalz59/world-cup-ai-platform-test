@@ -98,7 +98,9 @@ def build_team_match_features(
         team_features[column] = team_features[column].fillna(0)
 
     team_features["goal_difference"] = team_features["goals_for"] - team_features["goals_against"]
-    team_features["pass_completion_rate"] = team_features["completed_passes"] / team_features["passes"].replace(0, pd.NA)
+    team_features["pass_completion_rate"] = team_features["completed_passes"] / team_features["passes"].replace(
+        0, pd.NA
+    )
     team_features["result"] = team_features["goal_difference"].apply(
         lambda value: "win" if value > 0 else "draw" if value == 0 else "loss"
     )

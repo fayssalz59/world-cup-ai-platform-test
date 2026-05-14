@@ -4,11 +4,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_STATSBOMB_BASE_URL = (
-    "https://raw.githubusercontent.com/statsbomb/open-data/master/data"
-)
+DEFAULT_STATSBOMB_BASE_URL = "https://raw.githubusercontent.com/statsbomb/open-data/master/data"
 
 
 def configure_local_cert_bundle() -> None:

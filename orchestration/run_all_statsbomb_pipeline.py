@@ -1,6 +1,6 @@
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from loguru import logger
 
@@ -10,8 +10,8 @@ from ingestion.ingest_statsbomb_open_data import (
     ingest_statsbomb_open_data,
 )
 from ingestion.statsbomb_client import StatsBombOpenDataClient
-from ml.train_prematch_result_model import train_prematch_result_model
 from ml.train_match_result_model import train_match_result_model
+from ml.train_prematch_result_model import train_prematch_result_model
 from transformation.statsbomb_gold import build_gold_dataset
 from transformation.statsbomb_prematch import build_prematch_gold_dataset
 from transformation.statsbomb_silver import build_silver_dataset
@@ -34,9 +34,7 @@ def get_available_datasets(limit: int | None = None, selected_datasets: list[str
     if selected_datasets:
         selected = set(selected_datasets)
         competitions = [
-            competition
-            for competition in competitions
-            if dataset_key_from_competition(competition) in selected
+            competition for competition in competitions if dataset_key_from_competition(competition) in selected
         ]
     return competitions
 
@@ -148,8 +146,7 @@ def run_pipeline(
     prematch_min_history: int,
 ) -> list[str]:
     datasets = [
-        dataset_metadata(item)
-        for item in get_available_datasets(limit=limit, selected_datasets=selected_datasets)
+        dataset_metadata(item) for item in get_available_datasets(limit=limit, selected_datasets=selected_datasets)
     ]
     dataset_keys = sorted({dataset["dataset"] for dataset in datasets})
 
@@ -200,7 +197,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--ingestion-date",
-        default=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        default=datetime.now(UTC).strftime("%Y-%m-%d"),
     )
     parser.add_argument("--max-event-matches", type=int, default=9999)
     parser.add_argument("--workers", type=int, default=2)

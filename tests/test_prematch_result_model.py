@@ -10,9 +10,9 @@ from ml.train_prematch_result_model import (
 
 
 def sample_prematch_frame() -> pd.DataFrame:
-    rows = []
+    rows: list[dict[str, object]] = []
     for index, target in enumerate(["win", "loss", "draw", "win", "loss", "draw"]):
-        row = {column: float(index + 1) for column in FEATURE_COLUMNS}
+        row: dict[str, object] = {column: float(index + 1) for column in FEATURE_COLUMNS}
         row["home_prematch_matches_played_before"] = index
         row["away_prematch_matches_played_before"] = index
         row[TARGET_COLUMN] = target
@@ -25,7 +25,7 @@ def test_prepare_training_frame_filters_min_history() -> None:
 
     assert len(prepared) == 4
     assert prepared["home_prematch_matches_played_before"].min() >= 2
-    assert list(prepared.columns) == FEATURE_COLUMNS + [TARGET_COLUMN]
+    assert list(prepared.columns) == [*FEATURE_COLUMNS, TARGET_COLUMN]
 
 
 def test_prematch_model_can_fit_small_dataset() -> None:

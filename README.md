@@ -206,6 +206,23 @@ http://127.0.0.1:8000
 python -m pytest
 ```
 
+Run the full local quality gate:
+
+```powershell
+ruff check .
+black --check api ingestion ml orchestration transformation tests
+mypy api ingestion ml orchestration transformation tests
+pytest
+```
+
+Install and run pre-commit hooks:
+
+```powershell
+pip install -r requirements-dev.txt
+pre-commit install
+pre-commit run --all-files
+```
+
 Last known result:
 
 ```text

@@ -1,6 +1,6 @@
 import argparse
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import joblib
@@ -14,7 +14,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
 from ingestion.config import PROJECT_ROOT
-
 
 FEATURE_COLUMNS = [
     "home_xg",
@@ -57,14 +56,16 @@ def load_gold_datasets(datasets: list[str]) -> pd.DataFrame:
 
 
 def prepare_training_frame(dataframe: pd.DataFrame) -> pd.DataFrame:
-    required_columns = FEATURE_COLUMNS + [TARGET_COLUMN]
+    required_columns = [*FEATURE_COLUMNS, TARGET_COLUMN]
     missing = [column for column in required_columns if column not in dataframe.columns]
     if missing:
         raise ValueError(f"Missing required ML columns: {missing}")
     return dataframe[required_columns].dropna(subset=[TARGET_COLUMN])
 
 
-def split_dataset(dataframe: pd.DataFrame, test_size: float, random_state: int) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+def split_dataset(
+    dataframe: pd.DataFrame, test_size: float, random_state: int
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     x = dataframe[FEATURE_COLUMNS]
     y = dataframe[TARGET_COLUMN]
     stratify = y if y.value_counts().min() >= 2 else None
@@ -112,7 +113,9 @@ def evaluate_model(model: Pipeline, x_test: pd.DataFrame, y_test: pd.Series) -> 
     }
 
 
-def evaluate_dummy_baseline(x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, y_test: pd.Series) -> float:
+def evaluate_dummy_baseline(
+    x_train: pd.DataFrame, y_train: pd.Series, x_test: pd.DataFrame, y_test: pd.Series
+) -> float:
     dummy = DummyClassifier(strategy="most_frequent")
     dummy.fit(x_train, y_train)
     return accuracy_score(y_test, dummy.predict(x_test))
@@ -142,11 +145,10 @@ def train_match_result_model(
     metrics["train_rows"] = len(x_train)
     metrics["test_rows"] = len(x_test)
     metrics["feature_columns"] = FEATURE_COLUMNS
-    metrics["trained_at_utc"] = datetime.now(timezone.utc).isoformat()
+    metrics["trained_at_utc"] = datetime.now(UTC).isoformat()
     metrics["model_type"] = "RandomForestClassifier"
     metrics["model_note"] = (
-        "Post-match analytical baseline using match performance features, "
-        "not a pre-match prediction model."
+        "Post-match analytical baseline using match performance features, not a pre-match prediction model."
     )
 
     model_dir = PROJECT_ROOT / "models"

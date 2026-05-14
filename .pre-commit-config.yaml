@@ -1,0 +1,20 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: Ruff lint
+        entry: .venv/Scripts/python.exe -m ruff check --fix
+        language: system
+        types: [python]
+
+      - id: black
+        name: Black format
+        entry: .venv/Scripts/python.exe -m black api ingestion ml orchestration transformation tests
+        language: system
+        pass_filenames: false
+
+      - id: mypy
+        name: Mypy type check
+        entry: .venv/Scripts/python.exe -m mypy api ingestion ml orchestration transformation tests
+        language: system
+        pass_filenames: false
