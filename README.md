@@ -22,9 +22,8 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 
 - Project repository initialized
 - Python environment created
-- Azure CLI installed and detected
-- Azure login refresh pending
-- Azure Resource Group creation pending
-- Azure Storage Account creation pending
-- Bronze/Silver/Gold container creation pending
-- First test file upload to Azure Blob Storage pending
+- Azure CLI installed and configured
+- Azure Resource Group created
+- Azure Storage Account created
+- Bronze/Silver/Gold containers created
+- First test file uploaded to Azure Blob Storage

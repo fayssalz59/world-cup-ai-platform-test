@@ -18,25 +18,40 @@ python -m pip freeze > requirements.txt
 
 ## Azure Login
 
-If Azure CLI asks for an explicit management scope:
+After changing Azure accounts, clear the previous session:
+
+```powershell
+az logout
+az account clear
+```
+
+Then log in to the active Azure account:
 
 ```powershell
 az login --scope https://management.core.windows.net//.default
 ```
 
-For the Microsoft Learn Sandbox tenant used on Day 1:
+Only use `--tenant` if Azure shows several tenants and you know the correct tenant ID for the new account:
 
 ```powershell
-az login --tenant 604c1504-c6a3-4080-81aa-b33091104187 --scope https://management.core.windows.net//.default
+az login --tenant <your-tenant-id> --scope https://management.core.windows.net//.default
 ```
 
 Verify the active subscription:
 
 ```powershell
+az account list --output table
 az account show
 ```
 
 ## Azure Resources
+
+On Day 1, the active Azure subscription was:
+
+```text
+Azure subscription 1
+958fe4cd-d482-4e4c-8f45-22c52452137f
+```
 
 Create the Resource Group:
 
@@ -79,6 +94,12 @@ Run the upload smoke test:
 
 ```powershell
 python ingestion/upload_test_blob.py
+```
+
+Expected output:
+
+```text
+Uploaded blob: bronze/test/day1_upload.txt
 ```
 
 ## Concepts
