@@ -3,7 +3,7 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -207,7 +207,7 @@ def main() -> None:
         season_id=args.season_id,
         include_lineups=args.include_lineups,
         max_event_matches=args.max_event_matches,
-        ingestion_date=args.ingestion_date or datetime.utcnow().strftime("%Y-%m-%d"),
+        ingestion_date=args.ingestion_date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
     )
 
 

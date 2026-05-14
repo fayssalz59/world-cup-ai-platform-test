@@ -34,3 +34,9 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Bronze JSON is saved locally under `data/bronze/`
 - Bronze JSON is uploaded to Azure Blob Storage
 - Unit tests added for ingestion helpers
+
+## Day 3 Status
+
+- Bronze StatsBomb JSON transformed into Silver Parquet
+- Silver tables added for matches, events, shots, passes and lineups
+- Silver Parquet uploaded to Azure Blob Storage
