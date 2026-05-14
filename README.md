@@ -27,3 +27,10 @@ This project demonstrates an end-to-end data and AI platform using Azure, Python
 - Azure Storage Account created
 - Bronze/Silver/Gold containers created
 - First test file uploaded to Azure Blob Storage
+
+## Day 2 Status
+
+- Reusable StatsBomb Open Data ingestion added
+- Bronze JSON is saved locally under `data/bronze/`
+- Bronze JSON is uploaded to Azure Blob Storage
+- Unit tests added for ingestion helpers
