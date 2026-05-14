@@ -1,6 +1,7 @@
 import argparse
 import json
 import logging
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -51,9 +52,29 @@ def match_id_from_match(match: dict[str, Any]) -> int:
     return match_id
 
 
+def slugify(value: str) -> str:
+    value = value.lower().strip()
+    value = re.sub(r"[^a-z0-9]+", "_", value)
+    return value.strip("_")
+
+
+def infer_competition_slug(competition_id: int, season_id: int, competitions: list[dict[str, Any]]) -> tuple[str, str]:
+    for competition in competitions:
+        if (
+            competition.get("competition_id") == competition_id
+            and competition.get("season_id") == season_id
+        ):
+            competition_name = str(competition["competition_name"])
+            season_name = str(competition["season_name"])
+            if competition_name == "FIFA World Cup":
+                return "world_cup", slugify(season_name)
+            return slugify(competition_name), slugify(season_name)
+    return f"competition_{competition_id}", f"season_{season_id}"
+
+
 def bronze_paths(
-    competition_id: int,
-    season_id: int,
+    competition_slug: str,
+    season_slug: str,
     ingestion_date: str,
     match_id: int | None = None,
 ) -> dict[str, str]:
@@ -65,8 +86,8 @@ def bronze_paths(
         ),
         "matches": (
             "statsbomb/matches/"
-            "competition=world_cup/"
-            "season=2022/"
+            f"competition={competition_slug}/"
+            f"season={season_slug}/"
             f"ingestion_date={ingestion_date}/"
             "matches.json"
         ),
@@ -101,10 +122,16 @@ def ingest_statsbomb_open_data(
 
     logger.info("Fetching StatsBomb competitions")
     competitions = statsbomb_client.get_competitions()
+    competition_slug, season_slug = infer_competition_slug(
+        competition_id=competition_id,
+        season_id=season_id,
+        competitions=competitions,
+    )
+    logger.info("Using Bronze partition competition={} season={}", competition_slug, season_slug)
     persist_raw_json(
         uploader=uploader,
         local_bronze_dir=settings.local_bronze_dir,
-        blob_name=bronze_paths(competition_id, season_id, ingestion_date)["competitions"],
+        blob_name=bronze_paths(competition_slug, season_slug, ingestion_date)["competitions"],
         data=competitions,
     )
 
@@ -120,7 +147,7 @@ def ingest_statsbomb_open_data(
     persist_raw_json(
         uploader=uploader,
         local_bronze_dir=settings.local_bronze_dir,
-        blob_name=bronze_paths(competition_id, season_id, ingestion_date)["matches"],
+        blob_name=bronze_paths(competition_slug, season_slug, ingestion_date)["matches"],
         data=matches,
     )
 
@@ -128,7 +155,7 @@ def ingest_statsbomb_open_data(
     logger.info("Fetching events for {} match(es)", len(selected_matches))
     for match in tqdm(selected_matches, desc="StatsBomb events"):
         match_id = match_id_from_match(match)
-        match_paths = bronze_paths(competition_id, season_id, ingestion_date, match_id)
+        match_paths = bronze_paths(competition_slug, season_slug, ingestion_date, match_id)
         events = statsbomb_client.get_events(match_id)
         persist_raw_json(
             uploader=uploader,

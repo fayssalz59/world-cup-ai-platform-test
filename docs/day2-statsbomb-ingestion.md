@@ -37,11 +37,18 @@ Run a small Bronze ingestion smoke test:
 python -m ingestion.ingest_statsbomb_open_data --competition-id 43 --season-id 106 --max-event-matches 1 --include-lineups
 ```
 
+Run the latest Champions League season available in StatsBomb Open Data:
+
+```powershell
+python -m ingestion.ingest_statsbomb_open_data --competition-id 16 --season-id 4 --max-event-matches 1 --include-lineups
+```
+
 Expected Bronze blobs:
 
 ```text
 statsbomb/competitions/ingestion_date=<YYYY-MM-DD>/competitions.json
 statsbomb/matches/competition=world_cup/season=2022/ingestion_date=<YYYY-MM-DD>/matches.json
+statsbomb/matches/competition=champions_league/season=2018_2019/ingestion_date=<YYYY-MM-DD>/matches.json
 statsbomb/events/match_id=<match_id>/ingestion_date=<YYYY-MM-DD>/events.json
 statsbomb/lineups/match_id=<match_id>/ingestion_date=<YYYY-MM-DD>/lineups.json
 ```

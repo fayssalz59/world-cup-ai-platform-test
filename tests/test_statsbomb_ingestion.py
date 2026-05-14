@@ -5,7 +5,9 @@ import pytest
 from ingestion.ingest_statsbomb_open_data import (
     as_pretty_json,
     bronze_paths,
+    infer_competition_slug,
     match_id_from_match,
+    slugify,
     write_local_json,
 )
 from ingestion.statsbomb_client import StatsBombOpenDataClient
@@ -49,8 +51,8 @@ def test_match_id_from_match_rejects_missing_match_id() -> None:
 
 def test_bronze_paths_are_partitioned_for_data_lake() -> None:
     paths = bronze_paths(
-        competition_id=43,
-        season_id=106,
+        competition_slug="world_cup",
+        season_slug="2022",
         ingestion_date="2026-05-14",
         match_id=3857256,
     )
@@ -65,3 +67,21 @@ def test_bronze_paths_are_partitioned_for_data_lake() -> None:
     assert paths["events"] == (
         "statsbomb/events/match_id=3857256/ingestion_date=2026-05-14/events.json"
     )
+
+
+def test_slugify_makes_path_safe_values() -> None:
+    assert slugify("Champions League") == "champions_league"
+    assert slugify("2018/2019") == "2018_2019"
+
+
+def test_infer_competition_slug_keeps_world_cup_label_concise() -> None:
+    competitions = [
+        {
+            "competition_id": 43,
+            "season_id": 106,
+            "competition_name": "FIFA World Cup",
+            "season_name": "2022",
+        }
+    ]
+
+    assert infer_competition_slug(43, 106, competitions) == ("world_cup", "2022")
