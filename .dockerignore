@@ -1,0 +1,12 @@
+.git
+.pytest_cache
+.venv
+.azure-certs
+.tools
+__pycache__
+*.pyc
+data
+models
+reports
+run_all_statsbomb.ps1
+.env
