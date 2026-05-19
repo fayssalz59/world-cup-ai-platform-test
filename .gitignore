@@ -12,3 +12,16 @@ data/
 models/
 reports/
 run_all_statsbomb.ps1
+
+# Terraform local state/cache
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
