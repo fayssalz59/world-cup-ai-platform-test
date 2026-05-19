@@ -25,6 +25,7 @@ flowchart LR
 - Gold pre-match layer: rolling historical features with `shift(1)` to avoid current-match leakage.
 - ML: Random Forest baselines for post-match and pre-match match-result classification.
 - API: FastAPI service with `/health`, `/model/info`, and `/predict`.
+- Azure platform IaC: Terraform for Storage, ACR, Key Vault, Container Apps, and observability.
 - Orchestration: one Python command can run ingestion, transformations, and model training.
 - Tests: unit coverage for ingestion, transformations, ML helpers, orchestration, and API behavior.
 
@@ -238,6 +239,18 @@ Containers: bronze, silver, gold
 ```
 
 Authentication uses `DefaultAzureCredential`, with `Storage Blob Data Contributor` assigned to the Azure user.
+
+Target Azure platform resources are defined in:
+
+```text
+infra/terraform/
+```
+
+The deployment target includes Azure Container Registry, Key Vault, Log Analytics, Application Insights, and Azure Container Apps. See:
+
+```text
+docs/azure-platform-deployment.md
+```
 
 ## Roadmap
 
